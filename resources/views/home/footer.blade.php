@@ -9,10 +9,10 @@
         text-align: center;
     }
 </style>
-<div class="cpy_" class="footer">
-    <p class="mx-auto">© 2022 All Rights Reserved By <a href="https://html.design/">GTA-TV</a><br>
+<div style="background: #484545" class="cpy_" class="footer">
+    <p class="mx-auto">© 2022 All Rights Reserved By <a href="/">DELICIOUS EATS</a><br>
 
-        Distributed By <a href="https://themewagon.com/" target="_blank">nb_codes</a>
+        Distributed By <a href="/" target="_blank">project manager</a>
 
     </p>
 </div>

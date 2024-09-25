@@ -4,41 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GTA-TV</title>
+    <title>DELICIOUS EATS</title>
     @include('home.css')
     <style>
-        .div1
-        {
-            margin: auto;
+        .table-container {
+            max-width: 1400px; /* Adjust this value as needed */
+            margin: 0 auto; /* Center the container horizontally */
+        }
+        .table-container {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            height: 100%; /* Make sure the container takes up the full height of the parent */
+        }
+        .stripe-button {
+            display: inline-block;
+            background-color: #6772e5;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
             text-align: center;
-            padding:30px ;
-            width: 70%;
+            border-radius: 5px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .stripe-button:hover {
+            background-color: #5469d4;
+        }
 
-        }
-        table,th,td
-        {
-            border:20px solid black;
-        }
-        .th_deg
-        {
-            font-size: 20px;
-            padding: 5px;
-            background-color: limegreen;
-
-        }
-        .img
-        {
-            width: 100px;
-        }
-        .total
-        {
-            font-size: 20px;
-            padding: 40px;
-        }
     </style>
-
-
-
 </head>
 <body>
 @include('sweetalert::alert')
@@ -53,64 +47,71 @@
 
             </div>
         @endif
+        <div class="center" style="padding-top: 30px">
+            <h4 class="h1dg">CHECKOUT PRODUCT INFORMATION</h4>
+        </div>
         <!-- home section start -->
         <section class="about" id="about">
-            <div class="max-width">
-                <div class="div1" >
-                    <table>
-                        <tr>
-                            <th class="th_deg">Product Title</th>
-                            <th class="th_deg">Product Quantity</th>
-                            <th class="th_deg">Price</th>
-                            <th class="th_deg">Image</th>
-                            <th class="th_deg">Action</th>
-                        </tr>
+            <div class="table-container">
+            <table style="width: 100%;text-align: center;align-items: center" class="table">
+                <thead>
+                <tr>
+                    <th>Product Title</th>
+                    <th>Product Quantity</th>
+                    <th>Price</th>
+                    <th>Image</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <?php $totalprice=0; ?>
+                @foreach($cart as $cart)
+                    <tbody>
+                    <tr>
+                        <td data-label="Product title: ">{{$cart->product_title}}</td>
+                        <td data-label="Product Quantity: ">{{$cart->quantity}}</td>
+                        <td data-label="Price: ">$.{{$cart->price}}</td>
+                        <td data-label="Image: "><img class="img" src="/product/{{$cart->image}}"></td>
+                        <td data-label="Action: "><a onclick="return confirm('Are Sure You want to drop your product?')" href="{{url('clear_product',$cart->id)}}"><button  style="height: 37px" class="btn btn-danger">Remove</button></a> </td>
+                    </tr>
 
-                        <?php $totalprice=0; ?>
-                        @foreach($cart as $cart)
-                            <tr>
-                                <td>{{$cart->product_title}}</td>
-                                <td>{{$cart->quantity}}</td>
-                                <td>KSh.{{$cart->price}}</td>
-                                <td><img class="img" src="/product/{{$cart->image}}"></td>
-                                <td><a onclick="return confirm('Are Sure You want to drop your product?')" href="{{url('clear_product',$cart->id)}}"><button  style="height: 37px" class="btn btn-danger">Remove</button></a> </td>
-                            </tr>
-                                <?php $totalprice =$totalprice+$cart->price ?>
-                        @endforeach
+                        <?php $totalprice =$totalprice+$cart->price ?>
+                    @endforeach
 
 
-                    </table>
-                    <div>
-                        <h1 class="total">Total price: KSh.{{$totalprice}}</h1>
-                    </div>
 
-                    <div>Proceed to order</div>
-                    <a href="{{url('cash_order')}}" style="padding-bottom: 20px;" class="btn btn-success" >PAY FOR ALBUM</a>
-                    <a href="{{url('cash_order')}}" style="padding-bottom: 20px;" class="btn btn-success" >CASH ON DELIVERY</a>
-                    <a href="{{url('stripe',$totalprice)}}"  style="padding-bottom: 20px;" class="btn btn-primary">PAY USING CARD</a>
-                </div>
+                    </tbody>
+            </table>
             </div>
+            <div>
+                <h5 style="text-align: center" >Total price: $.{{$totalprice}}</h5>
+
+            </div>
+            <div>
+                <h5 style="text-align: center" > <a style="text-align: center" href="{{ url('/stripe/' . $totalprice) }}" class="stripe-button">
+                        Pay with Stripe - ${{ number_format($totalprice, 2) }}
+                    </a></h5>
+
+            </div>
+
+
+
         </section>
-
-        <div style="padding: 200px">
-
-        </div>
-
+    </div>
+</section>
+@include('home.about')
 
 
-        <!-- about section start -->
-
-        <!-- services section start -->
-
-        <!-- teams section start -->
-
-        <!-- contact section start -->
-
-        <!-- footer section start -->
 
 
-        <!-- script-->
+            <!-- footer section start -class="table"-->
+            <!--script-->
 @include('home.script')
 
 </body>
 </html>
+@include('home.footer')
+<style>
+    .li_1{
+        color: limegreen;
+    }
+</style>

@@ -56,10 +56,10 @@ class AdminController extends Controller
         $product->play = $request->play;
 
         $file = $request->play;
-        $filename = time() . '.' . $file->getClientOriginalExtension();
-        $file->move('product', $filename);
+//        $filename = time() . '.' . $file->getClientOriginalExtension();
+//        $file->move('product', $filename);
 
-        $product->play=$filename;
+//        $product->play=$filename;
         $validator = Validator::make($request->all(), [
             'file' => 'max:5120', //5MB
         ]);

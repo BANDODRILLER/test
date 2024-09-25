@@ -1,16 +1,18 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\BookSession;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use App\Models\Product;
+use App\Models\Campus;
 use App\Models\Cart;
 use RealRashid\SweetAlert\Facades\Alert;
 use App\Models\order;
-use Session;
 use Stripe;
 
 
@@ -19,9 +21,33 @@ class HomeController extends Controller
 
     public function index()
     {
-        $product=Product::paginate(10);
-        return view('home.userpage',compact('product'));
+        // Initialize universityValue to null
+        $universityValue = null;
+    
+        // Check if the user is authenticated
+        if (Auth::check()) {
+            $universityValue = Auth::user()->university;
+    
+            // Get the campus based on the university value
+            $campus = Campus::where('name', $universityValue)->first();
+    
+            if ($campus) {
+                // Get the associated restaurant names for the campus
+                $restaurantNames = $campus->restaurants()->pluck('name')->map('strtolower')->toArray();
+    
+                // Retrieve products that belong to these restaurant names
+                $product = Product::whereIn('catagory', $restaurantNames)->paginate(9);
+            } else {
+                $product = Product::paginate(9); // Default to all products if campus not found
+            }
+        } else {
+            // For unauthenticated users, show all products
+            $product = Product::paginate(9); // Default to all products
+        }
+    
+        return view('home.userpage', compact('product', 'universityValue'));
     }
+    
 
     public function redirect()
     {
@@ -33,7 +59,7 @@ class HomeController extends Controller
             $total_order=order::all()->count();
             $total_user=user::all()->count();
 
-            $order=order::all();
+            $order=order::where('delivery_status','=','delivered')->get();
             $total_revenue=0;
 
             foreach ($order as $order)
@@ -46,20 +72,57 @@ class HomeController extends Controller
             $total_processing=order::where('delivery_status','=','processing')->get()->count();
 
 
-
-
             return view('admin.home',compact('total_product','total_order','total_user','total_revenue','total_delivered','total_processing'));
 
         }
-        else
-        {
-            $product=Product::paginate(10);
-            return view('home.userpage',compact('product'));
+        else {
+         // Initialize universityValue to null
+        $universityValue = null;
+    
+        // Check if the user is authenticated
+        if (Auth::check()) {
+            $universityValue = Auth::user()->university;
+    
+            // Get the campus based on the university value
+            $campus = Campus::where('name', $universityValue)->first();
+    
+            if ($campus) {
+                // Get the associated restaurant names for the campus
+                $restaurantNames = $campus->restaurants()->pluck('name')->map('strtolower')->toArray();
+    
+                // Retrieve products that belong to these restaurant names
+                $product = Product::whereIn('catagory', $restaurantNames)->paginate(9);
+            } else {
+                $product = Product::paginate(9); // Default to all products if campus not found
+            }
+        } else {
+            // For unauthenticated users, show all products
+            $product = Product::paginate(9); // Default to all products
+        }
+    
+        return view('home.userpage', compact('product', 'universityValue'));
         }
     }
-
-    public function product_details($id)
+    public function university(Request $request)
     {
+        $universityValue = Auth::user()->university;
+
+        $campus = $request->input('campus'); 
+        $user = Auth::user();
+        $user -> university = $campus;
+        $user -> save();
+        $product = Product::paginate(9);
+
+        return view('home.userpage', compact('product','universityValue'));
+
+
+
+    }
+    
+
+    public function product_details(Request $request)
+    {
+        $id = $request->input('product_id');
         $product= product::find($id);
 
         return view('home.product_details',compact('product'));
@@ -184,7 +247,7 @@ class HomeController extends Controller
             $order->price=$data->price;
             $order->image=$data->image;
             $order->product_id=$data->product_id;
-            $order->payment_status='cash on delivery';
+            $order->payment_status='cash ';
             $order->delivery_status='processing';
 
             $order->save();
@@ -233,9 +296,9 @@ class HomeController extends Controller
     public function product_search(Request $request)
     {
         $search_text=$request->search;
-        $product=product::where('title','LIKE',"%$search_text%")->orWhere('catagory','LIKE',"%$search_text%")->paginate(10);
+        $product=product::where('title','LIKE',"%$search_text%")->orWhere('catagory','LIKE',"%$search_text%")->paginate(9);
 
-        return view('home.userpage',compact('product'));
+        return view('home.product_search',compact('product','search_text'));
     }
 
 
@@ -295,11 +358,27 @@ class HomeController extends Controller
         return view('home.listen',compact('product'));
     }
 
+    public function mpesaa()
+    {
+        $order=order::all();
+        return view('home.mpesaa');
+    }
+    public function session()
+    {
+        return view('home.session');
+    }
+    public function book(Request $request)
+    {
+        $book = new BookSession();
+        $book -> name = $request ->name;
+        $book -> number = $request -> Number;
+        $book ->artists = $request -> artists;
+        $book -> checkindate = $request -> date;
+        $book -> checkintime = $request -> time;
+        $book-> mpesa = $request -> mpesa;
+        $book -> save();
 
+        return redirect()->back();
 
-
-
-
-
-
+    }
 }

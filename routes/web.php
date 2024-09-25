@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ContactController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -57,7 +58,7 @@ route::post('update_product_confirm/{id}',[AdminController::class,'update_produc
 
 route::post('/send_user_email/{id}',[AdminController::class,'send_user_email']);
 
-route::get('/product_details/{id}',[HomeController::class,'product_details']);
+route::post('/product_details',[HomeController::class,'product_details']);
 
 route::post('add_cart/{id}',[HomeController::class,'add_cart']);
 
@@ -79,7 +80,14 @@ route::get('/stripe/{totalprice}',[HomeController::class,'stripe']);
 
 Route::post('/stripe/{totalprice}', [HomeController::class,'stripePost'])->name('stripe.post');
 
-route::get('listen/{id}',[HomeController::class,'listen']);
+route::get('mpesaa',[HomeController::class,'mpesaa']);
+
+Route::get('/contact',[ContactController::class,'show'])->name('contact.show');
+
+Route::post('/contact',[ContactController::class,'submit'])->name('contact.submit');
+Route::get('/session', [HomeController::class, 'session'])->name('session');
+Route::post('/book',[HomeController::class,'book'])->name('book');
+Route::post('/university', [HomeController::class, 'university'])->name('university');
 
 
 
